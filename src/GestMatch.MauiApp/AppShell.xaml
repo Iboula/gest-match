@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="GestMatch.MauiApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:GestMatch.MauiApp.Views"
+    Shell.FlyoutBehavior="Disabled">
+
+    <TabBar>
+        <!-- Onglet Matchs -->
+        <ShellContent
+            Title="Matchs"
+            ContentTemplate="{DataTemplate views:MatchListPage}"
+            Icon="matches.png"
+            Route="matches" />
+
+        <!-- Onglet Mes Billets -->
+        <ShellContent
+            Title="Mes Billets"
+            ContentTemplate="{DataTemplate views:MyTicketsPage}"
+            Icon="tickets.png"
+            Route="tickets" />
+
+        <!-- Onglet Profil -->
+        <ShellContent
+            Title="Profil"
+            ContentTemplate="{DataTemplate views:LoginPage}"
+            Icon="profile.png"
+            Route="profile" />
+    </TabBar>
+
+</Shell>

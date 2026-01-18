@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GestMatch.MauiApp.Views.MatchListPage"
+             xmlns:viewmodels="clr-namespace:GestMatch.MauiApp.ViewModels"
+             xmlns:models="clr-namespace:GestMatch.MauiApp.Models"
+             x:DataType="viewmodels:MatchListViewModel"
+             Title="Matchs">
+
+    <Grid RowDefinitions="Auto,*">
+        
+        <!-- Search Bar -->
+        <Frame Grid.Row="0" Padding="10" HasShadow="False" BorderColor="Transparent">
+            <HorizontalStackLayout Spacing="10">
+                <Entry Placeholder="Rechercher par ville..."
+                       Text="{Binding SearchCity}"
+                       HorizontalOptions="FillAndExpand"
+                       ReturnCommand="{Binding SearchCommand}"/>
+                <Button Text="🔍"
+                        Command="{Binding SearchCommand}"
+                        WidthRequest="50"/>
+            </HorizontalStackLayout>
+        </Frame>
+
+        <!-- Matches List -->
+        <RefreshView Grid.Row="1"
+                     IsRefreshing="{Binding IsRefreshing}"
+                     Command="{Binding RefreshCommand}">
+            <CollectionView ItemsSource="{Binding Matches}"
+                           SelectionMode="None">
+                
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="Aucun match disponible"
+                               FontSize="18"
+                               TextColor="{StaticResource Gray600}"
+                               HorizontalOptions="Center"/>
+                        <Button Text="Recharger"
+                                Command="{Binding LoadMatchesCommand}"
+                                Margin="0,20,0,0"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:MatchModel">
+                        <Frame Margin="10,5" Padding="15" HasShadow="True" BorderColor="Transparent">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MatchListViewModel}}, Path=MatchSelectedCommand}"
+                                                     CommandParameter="{Binding .}"/>
+                            </Frame.GestureRecognizers>
+                            
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
+                                
+                                <!-- Match Name -->
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding DisplayName}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Primary}"/>
+                                
+                                <!-- Date/Time -->
+                                <Label Grid.Row="1" Grid.Column="0"
+                                       Text="{Binding DateTimeDisplay}"
+                                       FontSize="14"
+                                       TextColor="{StaticResource Gray600}"/>
+                                
+                                <!-- Location -->
+                                <Label Grid.Row="2" Grid.Column="0"
+                                       FontSize="14"
+                                       TextColor="{StaticResource Gray600}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="📍 "/>
+                                            <Span Text="{Binding Stadium}"/>
+                                            <Span Text=" • "/>
+                                            <Span Text="{Binding City}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                
+                                <!-- Price & Tickets -->
+                                <HorizontalStackLayout Grid.Row="3" Grid.Column="0" Spacing="10" Margin="0,5,0,0">
+                                    <Label Text="{Binding PriceDisplay}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Success}"/>
+                                    <Label FontSize="14" TextColor="{StaticResource Gray600}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="• "/>
+                                                <Span Text="{Binding TicketsRemaining}"/>
+                                                <Span Text=" billets restants"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </HorizontalStackLayout>
+                                
+                                <!-- Arrow -->
+                                <Label Grid.Row="0" Grid.RowSpan="4" Grid.Column="1"
+                                       Text="›"
+                                       FontSize="30"
+                                       TextColor="{StaticResource Gray400}"
+                                       VerticalOptions="Center"/>
+                                
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.Row="1"
+                          IsRunning="{Binding IsLoading}"
+                          IsVisible="{Binding IsLoading}"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          Color="{StaticResource Primary}"/>
+        
+    </Grid>
+    
+</ContentPage>

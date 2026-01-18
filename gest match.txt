@@ -1,0 +1,225 @@
+Parfait 👍
+Je te propose une **Phase 1 claire, réaliste et orientée “gestion des matchs + billetterie”**, avec **rôles bien séparés** (gestionnaires vs simples utilisateurs), adaptée au contexte sénégalais.
+
+---
+
+# 📱 PHASE 1 – Gestion des matchs & billetterie (MVP)
+
+## 🎯 Objectif de la phase 1
+
+Mettre en ligne une **première version fonctionnelle** de l’application permettant :
+
+* à des **utilisateurs spécifiques** de **créer et gérer les matchs**
+* au **grand public** de **consulter les matchs**
+* d’**acheter / réserver des billets** pour les matchs
+
+👉 Pas encore de chat, stats avancées ou gestion d’équipe complète.
+On va à l’essentiel pour tester l’adoption.
+
+---
+
+## 👥 1. Gestion des rôles utilisateurs
+
+### 🔐 Rôles définis
+
+#### 🟢 1. Administrateur (Super Admin)
+
+* Crée les compétitions / ligues
+* Valide les comptes des gestionnaires
+* Accès total (back-office)
+
+#### 🟡 2. Gestionnaire de matchs (Organisateur)
+
+👉 **SEUL rôle autorisé à gérer les matchs**
+
+* Créer / modifier / annuler un match
+* Définir le stade, la date, l’heure
+* Définir les billets (prix, quantité)
+* Voir les ventes de billets
+
+Exemples :
+
+* Ligue régionale
+* Club
+* Fédération
+* Organisateur local de tournois
+
+#### 🔵 3. Utilisateur simple (Public)
+
+👉 **Consultation uniquement**
+
+* Voir les matchs
+* Voir les détails
+* Acheter / réserver un billet
+* Recevoir un billet (QR code)
+
+---
+
+## ⚽ 2. Gestion des matchs (cœur de la Phase 1)
+
+### 📌 Fonctionnalités côté **Gestionnaire**
+
+#### ➕ Création d’un match
+
+Champs minimum :
+
+* Compétition / tournoi
+* Équipe A – Équipe B
+* Date & heure
+* Stade / terrain
+* Ville / région
+* Type de match (amical, championnat, coupe)
+* Statut :
+
+  * Programmé
+  * Reporté
+  * Annulé
+  * Terminé
+
+#### ✏️ Modification
+
+* Changement d’heure
+* Changement de stade
+* Mise à jour du statut
+
+#### ❌ Annulation
+
+* Annuler un match
+* Message automatique aux utilisateurs
+* Blocage de la vente de billets
+
+---
+
+### 📌 Fonctionnalités côté **Utilisateur simple**
+
+#### 📅 Consultation
+
+* Liste des matchs à venir
+* Filtres :
+
+  * Date
+  * Ville
+  * Compétition
+* Page détail d’un match :
+
+  * Affiche officielle
+  * Infos complètes
+  * Bouton **Acheter un billet**
+
+---
+
+## 🎟️ 3. Gestion de la billetterie (élément clé)
+
+### 🎫 Types de billets
+
+* Billet standard
+* Billet VIP (optionnel)
+* Billet gratuit (pour matchs communautaires)
+
+### 📌 Paramètres définis par le gestionnaire
+
+* Prix du billet
+* Nombre total de billets
+* Date de fin de vente
+* Billets numériques uniquement (Phase 1)
+
+---
+
+### 💳 Paiement (adapté au Sénégal)
+
+👉 **Très important pour l’adoption**
+
+Méthodes recommandées :
+
+* 📱 **Wave**
+* 📱 **Orange Money**
+* 📱 **Free Money**
+* 💳 Carte bancaire (optionnel)
+
+*(Phase 1 : intégration 1 ou 2 moyens suffit)*
+
+---
+
+### 📲 Après paiement
+
+* Génération d’un **billet électronique**
+* QR Code unique
+* Billet stocké dans l’app
+* Option : envoi par **SMS / WhatsApp**
+
+---
+
+## 🧾 4. Contrôle des billets (simple mais efficace)
+
+### 🎯 Scan à l’entrée (Phase 1 simplifiée)
+
+* App “scanner” ou mode scanner dans l’app
+* Scan QR Code
+* Statut :
+
+  * ✅ Valide
+  * ❌ Déjà utilisé
+  * ❌ Invalide
+
+👉 Pas encore besoin de matériel lourd.
+
+---
+
+## 🧱 5. Architecture fonctionnelle (simplifiée)
+
+### 📱 Frontend
+
+* Application mobile (Android prioritaire)
+* Mode consultation rapide
+* Interface légère (faible connexion)
+
+### 🧠 Backend
+
+* Authentification par téléphone
+* API Matchs
+* API Billetterie
+* API Paiement
+* Base de données :
+
+  * Users
+  * Matchs
+  * Billets
+  * Paiements
+
+---
+
+## 📐 6. Écrans à concevoir (Phase 1)
+
+### 🧑‍💼 Gestionnaire
+
+1. Login
+2. Tableau de bord
+3. Créer un match
+4. Détails match
+5. Billetterie du match
+6. Ventes & billets vendus
+
+### 👤 Utilisateur
+
+1. Accueil (matchs à venir)
+2. Recherche / filtres
+3. Détails match
+4. Achat billet
+5. Mes billets (QR code)
+
+---
+
+## 🚀 7. Pourquoi cette Phase 1 est stratégique
+
+✔️ Répond à un vrai besoin local
+✔️ Facile à expliquer aux ligues/clubs
+✔️ Génère des revenus rapidement (billetterie)
+✔️ Évolutive vers :
+
+* stats
+* live score
+* sponsoring
+* streaming
+
+---
+
