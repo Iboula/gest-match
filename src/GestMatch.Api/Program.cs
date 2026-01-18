@@ -87,18 +87,46 @@ if (app.Environment.IsDevelopment())
     
     try
     {
-        logger.LogInformation("Checking database and applying migrations...");
+        logger.LogInformation("Checking database...");
         
-        // Créer la base de données si elle n'existe pas
+        // Vérifier si la base de données existe et si les tables sont créées
         var canConnect = await dbContext.Database.CanConnectAsync();
         if (!canConnect)
         {
-            logger.LogInformation("Database does not exist, creating...");
+            logger.LogInformation("Database does not exist, creating database...");
             await dbContext.Database.EnsureCreatedAsync();
         }
-        else
+        
+        // Vérifier si les tables existent en essayant de lire la table Users
+        var tablesExist = false;
+        try
         {
-            logger.LogInformation("Database exists, ensuring schema is up to date...");
+            await dbContext.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
+            tablesExist = true;
+            logger.LogInformation("Database schema already exists");
+        }
+        catch
+        {
+            logger.LogInformation("Database schema does not exist, creating tables...");
+        }
+        
+        // Créer le schéma si nécessaire
+        if (!tablesExist)
+        {
+            var sqlScriptPath = Path.Combine(AppContext.BaseDirectory, "InitialSchema.sql");
+            
+            if (File.Exists(sqlScriptPath))
+            {
+                logger.LogInformation("Executing InitialSchema.sql...");
+                var sqlScript = await File.ReadAllTextAsync(sqlScriptPath);
+                await dbContext.Database.ExecuteSqlRawAsync(sqlScript);
+                logger.LogInformation("Database schema created successfully");
+            }
+            else
+            {
+                logger.LogWarning("InitialSchema.sql not found at {Path}, attempting EnsureCreated...", sqlScriptPath);
+                await dbContext.Database.EnsureCreatedAsync();
+            }
         }
         
         logger.LogInformation("Seeding database with test data...");
