@@ -87,10 +87,19 @@ if (app.Environment.IsDevelopment())
     
     try
     {
-        logger.LogInformation("Applying database migrations...");
+        logger.LogInformation("Checking database and applying migrations...");
         
-        // Créer la base de données si elle n'existe pas et appliquer les migrations
-        await dbContext.Database.EnsureCreatedAsync();
+        // Créer la base de données si elle n'existe pas
+        var canConnect = await dbContext.Database.CanConnectAsync();
+        if (!canConnect)
+        {
+            logger.LogInformation("Database does not exist, creating...");
+            await dbContext.Database.EnsureCreatedAsync();
+        }
+        else
+        {
+            logger.LogInformation("Database exists, ensuring schema is up to date...");
+        }
         
         logger.LogInformation("Seeding database with test data...");
         

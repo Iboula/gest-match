@@ -1,6 +1,7 @@
 {
     "chat.tools.terminal.autoApprove": {
         "git commit": true,
-        "docker-compose": true
+        "docker-compose": true,
+        "git push": true
     }
 }
