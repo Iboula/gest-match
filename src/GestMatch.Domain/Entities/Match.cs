@@ -46,7 +46,7 @@ public class Match : BaseEntity
     /// <summary>
     /// Type de match
     /// </summary>
-    public MatchType MatchType { get; set; } = MatchType.Friendly;
+    public GestMatch.Domain.Enums.MatchType MatchType { get; set; } = GestMatch.Domain.Enums.MatchType.Friendly;
     
     /// <summary>
     /// Statut actuel du match

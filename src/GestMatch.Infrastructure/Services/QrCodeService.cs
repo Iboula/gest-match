@@ -24,8 +24,8 @@ public class QrCodeService : IQrCodeService
     public string GenerateQrCodeImage(string qrCodeData)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(qrCodeData, QRCodeGenerator.ECCLevel.Q);
-        using var qrCode = new PngByteQRCode(qrCodeData);
+        using var qrCodeInfo = qrGenerator.CreateQrCode(qrCodeData, QRCodeGenerator.ECCLevel.Q);
+        using var qrCode = new PngByteQRCode(qrCodeInfo);
         
         var qrCodeBytes = qrCode.GetGraphic(20);
         return Convert.ToBase64String(qrCodeBytes);

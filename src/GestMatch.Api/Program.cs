@@ -1,5 +1,6 @@
 using GestMatch.Api.Extensions;
 using GestMatch.Infrastructure.Data;
+using GestMatch.Infrastructure.Data.Seed;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -77,12 +78,17 @@ app.MapMatchEndpoints();
 app.MapTicketEndpoints();
 app.MapUserEndpoints();
 
-// Appliquer les migrations automatiquement (en dev uniquement)
+// Appliquer les migrations et seed les données (en dev uniquement)
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    // Appliquer les migrations
     await dbContext.Database.MigrateAsync();
+    
+    // Seed les données de test
+    await DatabaseSeeder.SeedAsync(dbContext);
 }
 
 app.Run();
