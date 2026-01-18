@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS "Users" (
     "Email" character varying(255) NOT NULL,
     "FullName" character varying(255) NOT NULL,
     "PhoneNumber" character varying(50),
+    "City" character varying(100),
     "Role" text NOT NULL,
     "CreatedAt" timestamp with time zone NOT NULL,
     "UpdatedAt" timestamp with time zone,
