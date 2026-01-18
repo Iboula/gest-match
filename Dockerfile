@@ -32,4 +32,8 @@ EXPOSE 80
 EXPOSE 443
 
 COPY --from=publish /app/publish .
+
+# Copier le script SQL d'initialisation
+COPY src/GestMatch.Infrastructure/Data/Scripts/InitialSchema.sql .
+
 ENTRYPOINT ["dotnet", "GestMatch.Api.dll"]
