@@ -83,12 +83,27 @@ if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     
-    // Appliquer les migrations
-    await dbContext.Database.MigrateAsync();
-    
-    // Seed les données de test
-    await DatabaseSeeder.SeedAsync(dbContext);
+    try
+    {
+        logger.LogInformation("Applying database migrations...");
+        
+        // Créer la base de données si elle n'existe pas et appliquer les migrations
+        await dbContext.Database.EnsureCreatedAsync();
+        
+        logger.LogInformation("Seeding database with test data...");
+        
+        // Seed les données de test
+        await DatabaseSeeder.SeedAsync(dbContext);
+        
+        logger.LogInformation("Database setup completed successfully!");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while setting up the database");
+        throw;
+    }
 }
 
 app.Run();
