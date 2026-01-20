@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS "Users" (
     "PhoneNumber" character varying(50),
     "City" character varying(100),
     "Role" text NOT NULL,
+    "IsActive" boolean NOT NULL DEFAULT TRUE,
     "CreatedAt" timestamp with time zone NOT NULL,
     "UpdatedAt" timestamp with time zone,
     CONSTRAINT "PK_Users" PRIMARY KEY ("Id")
