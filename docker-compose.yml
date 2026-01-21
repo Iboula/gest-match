@@ -1,10 +1,10 @@
-version: '3.8'
-
 services:
   # Base de données PostgreSQL
   postgres:
     image: postgres:16-alpine
     container_name: gestmatch-postgres
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: gestmatch
       POSTGRES_USER: gestmatch
@@ -27,6 +27,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: gestmatch-api
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
@@ -48,6 +50,8 @@ services:
   # pgAdmin (optionnel - pour la gestion de la base de données)
   pgadmin:
     image: dpage/pgadmin4:latest
+    env_file:
+      - .env
     container_name: gestmatch-pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@gestmatch.sn}
