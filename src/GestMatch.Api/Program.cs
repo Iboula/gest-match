@@ -2,6 +2,7 @@ using GestMatch.Api.Extensions;
 using GestMatch.Infrastructure.Data;
 using GestMatch.Infrastructure.Data.Seed;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,16 +14,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configuration de l'authentification Zitadel (JWT Bearer)
-builder.Services.AddZitadelAuthentication(builder.Configuration);
+// Configuration de l'authentification Zitadel (JWT Bearer) - DÉSACTIVÉE
+// builder.Services.AddZitadelAuthentication(builder.Configuration);
 
-// Configuration de l'autorisation par rôles
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("RequireMatchManager", policy => policy.RequireRole("Admin", "MatchManager"));
-    options.AddPolicy("RequireUser", policy => policy.RequireRole("Admin", "MatchManager", "User"));
-});
+// Configuration de l'autorisation par rôles - DÉSACTIVÉE
+// builder.Services.AddAuthorization(options =>
+// {
+//     options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
+//     options.AddPolicy("RequireMatchManager", policy => policy.RequireRole("Admin", "MatchManager"));
+//     options.AddPolicy("RequireUser", policy => policy.RequireRole("Admin", "MatchManager", "User"));
+// });
 
 // Enregistrement des services applicatifs
 builder.Services.AddApplicationServices();
@@ -38,9 +39,9 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configuration Swagger avec support JWT
+// Configuration OpenAPI avec OAuth2 pour Zitadel
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerWithJwt();
+builder.Services.AddSwaggerWithOAuth2(builder.Configuration);
 
 var app = builder.Build();
 
@@ -50,15 +51,28 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Use Swagger for OpenAPI document generation (served as /openapi/v1.json)
+    app.UseSwagger(options =>
+    {
+        options.RouteTemplate = "openapi/{documentName}.json";
+    });
+    
+    // Use Scalar for API documentation
+    app.MapScalarApiReference(options =>
+    {
+        options.Title = "GestMatch API";
+        options.Theme = ScalarTheme.Purple;
+        options.ShowSidebar = true;
+        options.WithOpenApiRoutePattern("/openapi/{documentName}.json");
+    });
 }
 
 app.UseHttpsRedirection();
 app.UseCors("MobileApp");
 
-app.UseAuthentication();
-app.UseAuthorization();
+// Authentication/Authorization désactivée pour le moment
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 // ====================
 // DÉFINITION DES ENDPOINTS

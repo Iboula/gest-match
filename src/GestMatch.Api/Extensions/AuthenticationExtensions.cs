@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GestMatch.Api.Extensions;
 
@@ -45,16 +46,19 @@ public static class AuthenticationExtensions
     }
 
     /// <summary>
-    /// Configure Swagger avec support de l'authentification JWT
+    /// Configure Swagger/OpenAPI avec support OAuth2 pour Zitadel (compatible .NET 8)
     /// </summary>
-    public static IServiceCollection AddSwaggerWithJwt(this IServiceCollection services)
+    public static IServiceCollection AddSwaggerWithOAuth2(this IServiceCollection services, IConfiguration configuration)
     {
+        var zitadelAuthority = configuration["Zitadel:Authority"] ?? "http://localhost:8081";
+        var zitadelPublicAuthority = configuration["Zitadel:PublicAuthority"] ?? zitadelAuthority;
+
         services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
-                Version = "v1",
                 Title = "GestMatch API",
+                Version = "v1",
                 Description = "API de gestion de matchs sportifs et billetterie numérique",
                 Contact = new OpenApiContact
                 {
@@ -63,15 +67,30 @@ public static class AuthenticationExtensions
                 }
             });
 
-            // Configuration de la sécurité JWT dans Swagger
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            // Configuration OAuth2 pour Zitadel
+            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
             {
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT",
-                In = ParameterLocation.Header,
-                Description = "JWT Authorization header using the Bearer scheme. Enter your token in the text input below."
+                Type = SecuritySchemeType.OAuth2,
+                Flows = new OpenApiOAuthFlows
+                {
+                    AuthorizationCode = new OpenApiOAuthFlow
+                    {
+                        AuthorizationUrl = new Uri($"{zitadelPublicAuthority}/oauth/v2/authorize"),
+                        TokenUrl = new Uri($"{zitadelPublicAuthority}/oauth/v2/token"),
+                        Scopes = new Dictionary<string, string>
+                        {
+                            { "openid", "OpenID Connect" },
+                            { "profile", "User profile" },
+                            { "email", "User email" },
+                            { "gestmatch.matches.create", "Créer des matchs" },
+                            { "gestmatch.matches.read", "Lire les matchs" },
+                            { "gestmatch.tickets.purchase", "Acheter des billets" },
+                            { "gestmatch.tickets.read", "Lire les billets" },
+                            { "gestmatch.tickets.scan", "Scanner les billets" }
+                        }
+                    }
+                },
+                Description = "ZITADEL OAuth2 Authorization"
             });
 
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -82,10 +101,10 @@ public static class AuthenticationExtensions
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
+                            Id = "oauth2"
                         }
                     },
-                    Array.Empty<string>()
+                    new[] { "openid", "profile", "email" }
                 }
             });
         });
