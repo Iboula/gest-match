@@ -21,59 +21,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Zitadel IDP (on-premise)
-  zitadel:
-    image: ghcr.io/zitadel/zitadel:latest
-    container_name: gestmatch-zitadel
-    command: 'start-from-init --masterkeyFromEnv --tlsMode disabled'
-    environment:
-      - ZITADEL_MASTERKEY=${ZITADEL_MASTERKEY:-MasterkeyNeedsToHave32Characters}
-      - ZITADEL_DATABASE_POSTGRES_HOST=zitadel-db
-      - ZITADEL_DATABASE_POSTGRES_PORT=5432
-      - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
-      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel
-      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=${ZITADEL_DB_PASSWORD:-zitadel123}
-      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=zitadel
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=${ZITADEL_DB_PASSWORD:-zitadel123}
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
-      - ZITADEL_EXTERNALSECURE=false
-      - ZITADEL_EXTERNALPORT=8080
-      - ZITADEL_EXTERNALDOMAIN=localhost:8080
-      - ZITADEL_FIRSTINSTANCE_ORG_NAME=GestMatch
-      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME=admin
-      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD=${ZITADEL_ADMIN_PASSWORD:-Admin@2026!}
-      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_FIRSTNAME=Admin
-      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_LASTNAME=GestMatch
-      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_EMAIL=admin@gestmatch.sn
-    ports:
-      - "8080:8080"
-    depends_on:
-      zitadel-db:
-        condition: service_healthy
-    networks:
-      - gestmatch-network
-    restart: unless-stopped
-
-  # Base de données PostgreSQL pour Zitadel
-  zitadel-db:
-    image: postgres:16-alpine
-    container_name: gestmatch-zitadel-db
-    environment:
-      POSTGRES_DB: zitadel
-      POSTGRES_USER: zitadel
-      POSTGRES_PASSWORD: ${ZITADEL_DB_PASSWORD:-zitadel123}
-    volumes:
-      - zitadel_data:/var/lib/postgresql/data
-    networks:
-      - gestmatch-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U zitadel"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
   # API .NET
   api:
     build:
@@ -86,7 +33,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=gestmatch;Username=gestmatch;Password=${POSTGRES_PASSWORD:-gestmatch123}
-      - Zitadel__Authority=http://zitadel:8080
+      - Zitadel__Authority=http://localhost:8081
       - Zitadel__Audience=${ZITADEL_AUDIENCE}
       - Zitadel__ClientId=${ZITADEL_CLIENT_ID}
       - Zitadel__ClientSecret=${ZITADEL_CLIENT_SECRET}
@@ -96,8 +43,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      zitadel:
-        condition: service_started
     networks:
       - gestmatch-network
     restart: unless-stopped
@@ -122,8 +67,6 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
-  zitadel_data:
     driver: local
 
 networks:

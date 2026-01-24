@@ -42,7 +42,8 @@ public static class MauiProgram
         // HTTP Client pour l'API
         services.AddHttpClient("GestMatchApi", client =>
         {
-            client.BaseAddress = new Uri("http://localhost:5000"); // À configurer selon l'environnement
+            // Utiliser 10.0.2.2 pour l'émulateur Android qui pointe vers localhost de la machine hôte
+            client.BaseAddress = new Uri("http://10.0.2.2:5000");
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
